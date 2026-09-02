@@ -41,4 +41,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+input: {
+  borderWidth: 2,
+  padding: 15,
+  width: '300',
+  fontSize: 30,
+ },
+  texto: {
+    fontSize: 30,
+    color: 'red',
+ }
 });

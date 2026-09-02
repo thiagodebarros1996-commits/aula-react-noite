@@ -4,7 +4,9 @@
 //import Aula04 from "./src/aula04";
 //import Aula05 from "./src/aula05";
 //import Aula06 from "./src/aula06";
-import Aula07 from "./src/aula07";
+//import Aula07 from "./src/aula07";
+//import Aula08 from "./src/aula08";
+import Aula09 from "./src/aula09";
 
 export default function App() {
   return (
@@ -14,6 +16,8 @@ export default function App() {
       //<Aula04 />
       //<Aula05 />
       // <Aula06 />
-      <Aula07 />
+      //<Aula07 />
+      //<Aula08 />
+      <Aula09 />
   );
 }
