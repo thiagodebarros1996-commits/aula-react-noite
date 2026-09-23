@@ -7,19 +7,13 @@
 //import Aula07 from "./src/aula07";
 //import Aula08 from "./src/aula08";
 //import Aula09 from "./src/aula09";
-import Aula10 from "./src/aula10";
+//import Aula10 from "./src/aula10";
+//import Aula11 from "./src/aula11";
+import TelaAtividade01 from "./src/telaatividade01";
+
+const AulaAtiva = TelaAtividade01;
 
 export default function App() {
-  return (
-      //<Aula01 />
-      //<Aula02 />
-      //<Aula03 />
-      //<Aula04 />
-      //<Aula05 />
-      // <Aula06 />
-      //<Aula07 />
-      //<Aula08 />
-      //<Aula09 />
-      <Aula10 />
-  );
+  const Componente = AulaAtiva;
+  return <Componente />;
 }

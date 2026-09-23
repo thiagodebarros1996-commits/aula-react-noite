@@ -69,7 +69,7 @@ class Aula05 extends Component {
                 
 
                 <Text style={styles.texto1}>Não tem conta? 
-                    <text style={styles.texto2}>Cadastre-se!</text>
+                    <Text style={styles.texto2}>Cadastre-se!</Text>
                 </Text>
 
                 
