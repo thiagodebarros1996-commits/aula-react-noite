@@ -6,50 +6,45 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
-
-/*
-  UPGRADE DE ÍCONES (opcional, quando instalar a lib):
-    npm install react-native-vector-icons
-  e trocada cada <Text>{aba.emoji}</Text> por, ex.:
-    import Ionicons from 'react-native-vector-icons/Ionicons';
-    <Ionicons name="home-outline" size={22} color={ativo ? '#FFF' : 'rgba(255,255,255,0.7)'} />
-  Isso deixa os ícones monocromáticos iguais ao mockup (hoje uso emoji p/ rodar sem lib).
-*/
 
 class TelaAtividade03 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      abaAtual: 'inicio', // 'inicio' | 'noticias' | 'calendario' | 'perfil'
+      abaAtual: 'inicio', // 'inicio' | 'noticias' | 'chat' | 'calendario' | 'perfil'
     };
 
-    // abas da barra inferior (2 à esquerda do vão central, 2 à direita)
-    this.abas = [
-      { chave: 'inicio',     rotulo: 'Início',     emoji: '🏠' },
-      { chave: 'noticias',   rotulo: 'Notícias',   emoji: '📰' },
-      { chave: 'calendario', rotulo: 'Calendário', emoji: '📅' },
-      { chave: 'perfil',     rotulo: 'Perfil',     emoji: '👤' },
+    // Abas laterais (2 à esquerda do botão central, 2 à direita)
+    this.abasLaterais = [
+      { chave: 'inicio', rotulo: 'Início', icone: '🏠' },
+      { chave: 'noticias', rotulo: 'Notícias', icone: '📰' },
+      { chave: 'calendario', rotulo: 'Calendário', icone: '📅' },
+      { chave: 'perfil', rotulo: 'Perfil', icone: '👤' },
     ];
 
-    // avisos do feed (aba Início). 'temImagem' liga o placeholder de foto.
-    this.avisos = [
+    // Conteúdo do feed
+    this.feedItems = [
       {
         id: '1',
-        titulo: 'Feira de Ciências 2026: Inscrições Abertas!',
+        titulo: 'Feira de Ciências 2026:\nInscrições Abertas!',
         tag: 'Periódico',
         corpo:
-          'Feira de Ciências 2026: Inscrições Abertas! No mês a acessa contaua de escudala e Alitera: Inscrições Aberta...',
+          'Estão abertas as inscrições para a Feira de Ciências 2026! Participe com o seu projeto e mostre o que você aprendeu. Confira as datas e o regulamento com a coordenação da escola.',
         data: '15 Maio',
-        temImagem: true,
+        imagem: require('../img/feira.jpg'),
+        temBloco: false,
       },
       {
         id: '2',
-        titulo: 'Comunicado: Alteração no Horário da Biblioteca',
+        titulo: 'Comunicado: Alteração no\nHorário da Biblioteca',
         tag: null,
         corpo: '',
         data: '14 Maio',
-        temImagem: false,
+        imagem: null,
+        temBloco: true,
       },
     ];
   }
@@ -58,342 +53,377 @@ class TelaAtividade03 extends Component {
     this.setState({ abaAtual: chave });
   };
 
-  // botão central (logo): ação rápida / chat. Sem lib, só loga.
-  onBotaoCentral = () => {
-    console.log('Botão central: Chat / ação rápida');
-    // Upgrades possíveis (100% core RN): abrir um <Modal visible=...> de chat,
-    // ou, com react-navigation, this.props.navigation.navigate('Chat').
-  };
-
-  onPerfilTopo = () => {
-    // o ícone do topo leva à mesma aba "Perfil" da barra
-    this.setState({ abaAtual: 'perfil' });
-  };
-
-  // ---- render de um item da barra ----
-  renderAba = (aba) => {
-    const ativo = this.state.abaAtual === aba.chave;
-    return (
-      <TouchableOpacity
-        key={aba.chave}
-        style={styles.abaItem}
-        activeOpacity={0.7}
-        onPress={() => this.trocarAba(aba.chave)}
-      >
-        <Text style={[styles.abaEmoji, !ativo && styles.abaEmojiInativo]}>
-          {aba.emoji}
-        </Text>
-        <Text style={[styles.abaRotulo, ativo && styles.abaRotuloAtivo]}>
-          {aba.rotulo}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
-  // ---- render de um card do feed ----
-  renderAviso = (item) => {
-    return (
-      <View key={item.id} style={styles.card}>
-        {item.temImagem && (
-          /* Troque este bloco por:
-             <Image source={require('../img/feira.png')} style={styles.cardImg} />
-             ou  <Image source={{ uri: 'https://...' }} style={styles.cardImg} />  */
-          <View style={styles.cardImgPlaceholder}>
-            <Text style={styles.cardImgEmoji}>🖼️</Text>
-            <Text style={styles.cardImgLegenda}>Foto da Feira de Ciências</Text>
-          </View>
-        )}
-
-        <View style={styles.cardCorpo}>
-          <Text style={styles.cardTitulo}>{item.titulo}</Text>
-
-          {item.tag ? (
-            <Text style={styles.cardTag}>{item.tag}</Text>
-          ) : null}
-
-          {item.corpo ? (
-            <Text style={styles.cardTexto} numberOfLines={2}>
-              {item.corpo}
-            </Text>
-          ) : null}
-
-          <Text style={styles.cardData}>{item.data}</Text>
-        </View>
-      </View>
-    );
-  };
-
-  // ---- corpo: feed (Início) ou placeholder (demais abas) ----
-  renderCorpo = () => {
-    if (this.state.abaAtual === 'inicio') {
-      return (
-        <ScrollView
-          style={styles.corpo}
-          contentContainerStyle={styles.corpoFeed}
-          showsVerticalScrollIndicator={false}
-        >
-          {this.avisos.map(this.renderAviso)}
-        </ScrollView>
-      );
-    }
-
-    const aba = this.abas.find((a) => a.chave === this.state.abaAtual);
-    return (
-      <View style={styles.paginaSimples}>
-        <Text style={styles.paginaEmoji}>{aba ? aba.emoji : '📄'}</Text>
-        <Text style={styles.paginaTitulo}>{aba ? aba.rotulo : ''}</Text>
-        <Text style={styles.paginaSub}>Tela em construção</Text>
-      </View>
-    );
-  };
-
   render() {
+    const { abaAtual } = this.state;
+
     return (
       <View style={styles.container}>
-        {/* ---------- Header: logo no centro, perfil à direita ---------- */}
-        <View style={styles.header}>
-          <View style={styles.headerLado} /> {/* spacer esq p/ centralizar */}
-          <Image
-            source={require('../img/logo-barao.png')}
-            style={styles.headerLogo}
-            resizeMode="contain"
-          />
-          <View style={styles.headerLado}>
-            <TouchableOpacity onPress={this.onPerfilTopo} hitSlop={8}>
-              <Text style={styles.headerPerfil}>👤</Text>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
+
+        {/* --- HEADER PRETO --- */}
+        <SafeAreaView style={styles.headerSafe}>
+          <View style={styles.header}>
+            <View style={styles.headerLado} />
+
+            <View style={styles.logoCirculo}>
+              <View style={styles.logoFundo} />
+              <Image
+                source={require('../img/logo-barao.png')}
+                style={styles.logoTopo}
+                resizeMode="contain"
+              />
+            </View>
+
+            <TouchableOpacity
+              style={styles.headerLado}
+              activeOpacity={0.7}
+              onPress={() => this.trocarAba('perfil')}
+            >
+              <View style={styles.iconPerfilContainer}>
+                <Text style={styles.iconPerfilTexto}>👤</Text>
+              </View>
             </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
 
-        {/* ---------- Corpo (feed ou placeholder) ---------- */}
-        {this.renderCorpo()}
+        {/* --- FEED --- */}
+        <ScrollView
+          style={styles.scrollArea}
+          contentContainerStyle={styles.scrollInner}
+          showsVerticalScrollIndicator={false}
+        >
+          {this.feedItems.map((item) => (
+            // card externo: sombra | card interno: recorta os cantos arredondados
+            <View key={item.id} style={styles.cardSombra}>
+              <View style={styles.card}>
+                {item.imagem ? (
+                  <Image
+                    source={item.imagem}
+                    style={styles.cardImagem}
+                    resizeMode="cover"
+                  />
+                ) : null}
 
-        {/* ---------- Barra inferior (absoluta, com vão central) ---------- */}
-        <View style={styles.barra}>
-          <View style={styles.barraLado}>
-            {this.abas.slice(0, 2).map(this.renderAba)}
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{item.titulo}</Text>
+                  {item.tag ? <Text style={styles.cardTag}>{item.tag}</Text> : null}
+                  {item.corpo ? (
+                    <Text style={styles.cardBody} numberOfLines={3}>
+                      {item.corpo}
+                    </Text>
+                  ) : null}
+                  <Text style={styles.cardDate}>{item.data}</Text>
+                  {item.temBloco ? <View style={styles.cardBloco} /> : null}
+                </View>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* --- BARRA INFERIOR --- */}
+        {/* box-none: a área transparente de cima deixa o toque passar para o feed */}
+        <View style={styles.bottomWrapper} pointerEvents="box-none">
+          <View style={styles.bottomBar}>
+            <View style={styles.navSide}>
+              {this.abasLaterais.slice(0, 2).map((aba) => (
+                <NavItem
+                  key={aba.chave}
+                  aba={aba}
+                  ativo={abaAtual === aba.chave}
+                  onPress={() => this.trocarAba(aba.chave)}
+                />
+              ))}
+            </View>
+
+            {/* espaço reservado para o botão central */}
+            <View style={styles.centerSpacer} />
+
+            <View style={styles.navSide}>
+              {this.abasLaterais.slice(2).map((aba) => (
+                <NavItem
+                  key={aba.chave}
+                  aba={aba}
+                  ativo={abaAtual === aba.chave}
+                  onPress={() => this.trocarAba(aba.chave)}
+                />
+              ))}
+            </View>
           </View>
-          <View style={styles.barraVao} /> {/* vão onde o botão central encaixa */}
-          <View style={styles.barraLado}>
-            {this.abas.slice(2).map(this.renderAba)}
-          </View>
-        </View>
 
-        {/* ---------- Botão central (logo) por cima da barra ---------- */}
-        <View style={styles.botaoCentralWrapper}>
+          {/* faixa verde de baixo com a linha do "home indicator" */}
+          <View style={styles.bottomStripe}>
+            <View style={styles.homeIndicator} />
+          </View>
+
+          {/* botão central (Chat) saindo da barra */}
           <TouchableOpacity
-            style={styles.botaoCentral}
             activeOpacity={0.85}
-            onPress={this.onBotaoCentral}
+            style={styles.centerButton}
+            onPress={() => this.trocarAba('chat')}
           >
-            <Image
-              source={require('../img/logo-barao.png')}
-              style={styles.botaoCentralImg}
-              resizeMode="contain"
-            />
+            <View style={styles.centerLogoWrap}>
+              <View style={styles.centerLogoFundo} />
+              <Image
+                source={require('../img/logo-barao.png')}
+                style={styles.centerLogoImg}
+                resizeMode="contain"
+              />
+            </View>
           </TouchableOpacity>
+          <Text
+            pointerEvents="none"
+            style={[
+              styles.centerLabel,
+              abaAtual === 'chat' && styles.navLabelAtivo,
+            ]}
+          >
+            Chat
+          </Text>
         </View>
       </View>
     );
   }
 }
 
-// mesma paleta das telas 1 e 2
-const cores = {
-  verde: '#4CAF50',
-  placeholder: '#9E9E9E',
-  cinzaTexto: '#6B6B6B',
-  branco: '#FFFFFF',
-  branco70: 'rgba(255,255,255,0.7)',
-  preto: '#000000',
-  fundoFeed: '#F4F4F4',
-  bordaSuave: '#E0E0E0',
-};
+// Item da barra inferior
+const NavItem = ({ aba, ativo, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles.navItem} activeOpacity={0.7}>
+    <Text style={[styles.navIcon, { opacity: ativo ? 1 : 0.85 }]}>{aba.icone}</Text>
+    <Text style={[styles.navLabel, ativo && styles.navLabelAtivo]}>{aba.rotulo}</Text>
+  </TouchableOpacity>
+);
 
-const ALTURA_BARRA = 60;
-const TAM_BOTAO = 60;
+const COLORS = {
+  green: '#4CAF50',
+  white: '#FFFFFF',
+  black: '#000000',
+  background: '#F2F2F2',
+  textDark: '#111111',
+  textGray: '#8A8A8A',
+  blocoGray: '#EFEFEF',
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: cores.fundoFeed,
+    backgroundColor: COLORS.background,
   },
 
-  // ----- header -----
+  // --- Header ---
+  headerSafe: {
+    backgroundColor: COLORS.black,
+  },
   header: {
+    height: 56,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: cores.branco,
-    height: 56,
-    paddingHorizontal: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: cores.bordaSuave,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    backgroundColor: COLORS.black,
   },
   headerLado: {
-    flex: 1,
+    width: 36,
     alignItems: 'flex-end',
   },
-  headerLogo: {
+  // logo verde; o círculo branco atrás garante as escritas brancas
+  logoCirculo: {
     width: 40,
     height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  headerPerfil: {
-    fontSize: 22,
+  logoFundo: {
+    position: 'absolute',
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    backgroundColor: COLORS.white,
   },
-
-  // ----- corpo -----
-  corpo: {
-    flex: 1,
+  logoTopo: {
+    width: 40,
+    height: 40,
+    tintColor: COLORS.green, // logo verde
   },
-  corpoFeed: {
-    padding: 16,
-    paddingBottom: ALTURA_BARRA + 40, // não esconde o último card atrás da barra
-  },
-  paginaSimples: {
-    flex: 1,
+  iconPerfilContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: ALTURA_BARRA,
   },
-  paginaEmoji: {
-    fontSize: 56,
-    opacity: 0.5,
-  },
-  paginaTitulo: {
-    marginTop: 12,
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: cores.preto,
-  },
-  paginaSub: {
-    marginTop: 4,
-    fontSize: 14,
-    color: cores.cinzaTexto,
+  iconPerfilTexto: {
+    fontSize: 16,
   },
 
-  // ----- card do feed -----
-  card: {
-    backgroundColor: cores.branco,
-    borderRadius: 12,
+  // --- Feed ---
+  scrollArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollInner: {
+    paddingHorizontal: 12,
+    paddingTop: 14,
+    paddingBottom: 130, // espaço para a barra inferior
+  },
+  // sombra fica fora (no iOS, overflow:hidden cortaria a sombra)
+  cardSombra: {
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
     marginBottom: 16,
-    overflow: 'hidden', // arredonda a imagem no topo
-    // sombra (iOS) + elevation (Android)
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 3,
   },
-  cardImgPlaceholder: {
+  card: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: COLORS.white,
+  },
+  cardImagem: {
+    width: '100%',
     height: 150,
-    backgroundColor: '#E8E8E8',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  cardImgEmoji: {
-    fontSize: 40,
+  cardContent: {
+    paddingHorizontal: 14,
+    paddingVertical: 14,
   },
-  cardImgLegenda: {
-    marginTop: 6,
-    fontSize: 12,
-    color: cores.cinzaTexto,
-  },
-  cardCorpo: {
-    padding: 14,
-  },
-  cardTitulo: {
-    fontSize: 16,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: cores.preto,
+    color: COLORS.textDark,
+    marginBottom: 6,
   },
   cardTag: {
-    marginTop: 6,
     fontSize: 12,
-    color: cores.cinzaTexto,
+    color: COLORS.textGray,
+    marginBottom: 10,
   },
-  cardTexto: {
-    marginTop: 8,
+  cardBody: {
     fontSize: 13,
-    color: cores.cinzaTexto,
-    lineHeight: 18,
+    color: COLORS.textDark,
+    lineHeight: 19,
+    marginBottom: 14,
   },
-  cardData: {
-    marginTop: 10,
-    fontSize: 12,
-    color: cores.cinzaTexto,
+  cardDate: {
+    fontSize: 13,
+    color: COLORS.textGray,
+  },
+  cardBloco: {
+    height: 90,
+    borderRadius: 14,
+    backgroundColor: COLORS.blocoGray,
+    marginTop: 14,
   },
 
-  // ----- barra inferior -----
-  barra: {
+  // --- Barra inferior ---
+  // altura = 30 (área do botão que sai) + 62 (barra) + 24 (faixa verde)
+  bottomWrapper: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: ALTURA_BARRA,
+    height: 116,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  bottomBar: {
+    alignSelf: 'stretch',
+    height: 62,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: cores.verde,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: -2 },
-    elevation: 8,
+    backgroundColor: COLORS.black,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 6,
   },
-  barraLado: {
+  navSide: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
   },
-  barraVao: {
-    width: TAM_BOTAO, // reserva o espaço exato do botão central
+  centerSpacer: {
+    width: 78,
   },
-  abaItem: {
+  navItem: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 4,
   },
-  abaEmoji: {
+  navIcon: {
     fontSize: 20,
+    marginBottom: 2,
   },
-  abaEmojiInativo: {
-    opacity: 0.65,
+  navLabel: {
+    fontSize: 10,
+    color: COLORS.white,
   },
-  abaRotulo: {
-    marginTop: 2,
-    fontSize: 11,
-    color: cores.branco70,
-  },
-  abaRotuloAtivo: {
-    color: cores.branco,
+  navLabelAtivo: {
+    color: COLORS.green,
     fontWeight: 'bold',
   },
 
-  // ----- botão central (notch) -----
-  botaoCentralWrapper: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: ALTURA_BARRA / 2 - TAM_BOTAO / 2, // metade do botão sai pra cima da barra
+  // faixa verde
+  bottomStripe: {
+    alignSelf: 'stretch',
+    height: 24,
+    backgroundColor: COLORS.green,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
     alignItems: 'center',
-    zIndex: 10,
-  },
-  botaoCentral: {
-    width: TAM_BOTAO,
-    height: TAM_BOTAO,
-    borderRadius: TAM_BOTAO / 2,
-    backgroundColor: cores.branco,
     justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 6,
   },
-  botaoCentralImg: {
-    width: 34,
-    height: 34,
+  homeIndicator: {
+    width: 110,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.black,
+    opacity: 0.85,
+  },
+
+  // botão central (fica dentro do wrapper, então recebe toque no Android)
+  // 3) círculo preto do botão
+centerButton: {
+  position: 'absolute',
+  top: 0,
+  width: 58,              // era 64
+  height: 58,             // era 64
+  borderRadius: 40,       // sempre metade do width
+  backgroundColor: COLORS.black,
+  justifyContent: 'center',
+  alignItems: 'center',
+  shadowColor: COLORS.black,
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.3,
+  shadowRadius: 5,
+  elevation: 8,
+},
+  centerLogoWrap: {
+    width: 54,
+    height: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerLogoFundo: {
+    position: 'absolute',
+    width: 47,
+    height: 47,
+    borderRadius: 24,
+    backgroundColor: COLORS.white,
+  },
+  centerLogoImg: {
+    width: 54,
+    height: 54,
+    tintColor: COLORS.green, // logo verde
+  },
+  centerLabel: {
+    position: 'absolute',
+    top: 70,
+    fontSize: 10,
+    color: COLORS.white,
   },
 });
 

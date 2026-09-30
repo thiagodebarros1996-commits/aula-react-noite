@@ -20,12 +20,15 @@ import React from 'react';
 // import Aula11 from "./src/aula11";
 
 // ----- Telas da atividade atual --------------------------------------
-// import TelaAtividade01 from './src/telaatividade01';   // Login
-// import TelaAtividade02 from './src/telaatividade2';     // Cadastro
-import TelaAtividade03 from './src/telaatividade03';        // Home (quando existir)
+ //import TelaAtividade01 from './src/telaatividade01';   // Login
+ //import TelaAtividade02 from './src/telaatividade2';     // Cadastro
+//import TelaAtividade03 from './src/telaatividade03';        // Home (quando existir)
+import Tela01 from './src/appTela01'; // Tela de teste (sem função)
 
-const AulaAtiva = TelaAtividade03; // precisa bater com o import ativo acima
+
 
 export default function App() {
-  return <AulaAtiva />;
+  return (
+  <Tela01 />
+);
 }

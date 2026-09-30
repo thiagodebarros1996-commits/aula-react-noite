@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 
 class TelaAtividade02 extends Component {
@@ -18,24 +20,17 @@ class TelaAtividade02 extends Component {
       senha: '',
       confirmar: '',
       tipoUsuario: 'Aluno',
-      dropdownAberto: false,
     };
     // opções do "Tipo de Usuário" (mockup: Aluno / Responsável / Professor)
     this.tipos = ['Aluno', 'Responsável', 'Professor'];
   }
 
-  // alterna o dropdown aberto/fechado
-  toggleDropdown = () => {
-    this.setState((ant) => ({ dropdownAberto: !ant.dropdownAberto }));
-  };
-
-  // escolhe um item e fecha
   selecionarTipo = (tipo) => {
-    this.setState({ tipoUsuario: tipo, dropdownAberto: false });
+    this.setState({ tipoUsuario: tipo });
   };
 
   onCadastrar = () => {
-    const { nome, email, senha, confirmar } = this.state;
+    const { nome, email, senha, confirmar, tipoUsuario } = this.state;
 
     if (!nome.trim()) {
       console.log('Informe o nome completo.');
@@ -54,11 +49,7 @@ class TelaAtividade02 extends Component {
       return;
     }
 
-    console.log('Cadastro:', {
-      nome,
-      email,
-      tipoUsuario: this.state.tipoUsuario,
-    });
+    console.log('Cadastro:', { nome, email, tipoUsuario });
     // Ao plugar o react-navigation, descomente:
     // if (this.props.navigation) this.props.navigation.navigate('Home');
   };
@@ -66,33 +57,42 @@ class TelaAtividade02 extends Component {
   onFacaLogin = () => {
     console.log('Voltar para o login');
     // if (this.props.navigation) this.props.navigation.navigate('Login');
-    // (ou this.props.navigation.goBack(), dependendo das suas rotas)
   };
 
   render() {
-    const { dropdownAberto, tipoUsuario } = this.state;
+    const { tipoUsuario } = this.state;
 
     return (
       <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor={cores.preto} />
+
+        {/* faixa preta do topo com a logo pequena (igual ao mockup) */}
+        <SafeAreaView style={styles.headerSafe}>
+          <View style={styles.header}>
+            <View style={styles.logoCirculo}>
+              <View style={styles.logoFundo} />
+              <Image
+                source={require('../img/logo-barao.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+          </View>
+        </SafeAreaView>
+
         <ScrollView
           style={styles.conteudo}
           contentContainerStyle={styles.conteudoInner}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Image
-            source={require('../img/logo-barao.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-
           <Text style={styles.title}>Crie sua conta</Text>
           <Text style={styles.subtitle}>Preencha os dados</Text>
 
           <TextInput
             style={styles.input}
             placeholder="Nome Completo"
-            placeholderTextColor={cores.placeholder}
+            placeholderTextColor={cores.verde}
             value={this.state.nome}
             onChangeText={(texto) => this.setState({ nome: texto })}
           />
@@ -100,7 +100,7 @@ class TelaAtividade02 extends Component {
           <TextInput
             style={styles.input}
             placeholder="E-mail"
-            placeholderTextColor={cores.placeholder}
+            placeholderTextColor={cores.verde}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
@@ -111,7 +111,7 @@ class TelaAtividade02 extends Component {
           <TextInput
             style={styles.input}
             placeholder="Senha"
-            placeholderTextColor={cores.placeholder}
+            placeholderTextColor={cores.verde}
             secureTextEntry
             autoCapitalize="none"
             value={this.state.senha}
@@ -121,49 +121,36 @@ class TelaAtividade02 extends Component {
           <TextInput
             style={styles.input}
             placeholder="Confirmar Senha"
-            placeholderTextColor={cores.placeholder}
+            placeholderTextColor={cores.verde}
             secureTextEntry
             autoCapitalize="none"
             value={this.state.confirmar}
             onChangeText={(texto) => this.setState({ confirmar: texto })}
           />
 
-          {/* ---- Tipo de Usuário (dropdown feito à mão, sem libs) ---- */}
+          {/* ---- Tipo de Usuário: caixa com as 3 opções + seta (igual ao mockup) ---- */}
           <Text style={styles.label}>Tipo de Usuário</Text>
-          <View style={styles.dropdownWrapper}>
-            <TouchableOpacity
-              style={[
-                styles.dropdownBotao,
-                dropdownAberto && styles.dropdownBotaoAberto,
-              ]}
-              activeOpacity={0.7}
-              onPress={this.toggleDropdown}
-            >
-              <Text style={styles.dropdownValor}>{tipoUsuario}</Text>
-              <Text style={styles.dropdownSeta}>{dropdownAberto ? '∧' : '∨'}</Text>
-            </TouchableOpacity>
-
-            {dropdownAberto && (
-              <View style={styles.menu}>
-                {this.tipos.map((tipo) => (
-                  <TouchableOpacity
-                    key={tipo}
-                    style={styles.menuItem}
-                    activeOpacity={0.6}
-                    onPress={() => this.selecionarTipo(tipo)}
+          <View style={styles.selectBox}>
+            <View style={styles.selectOpcoes}>
+              {this.tipos.map((tipo) => (
+                <TouchableOpacity
+                  key={tipo}
+                  activeOpacity={0.6}
+                  onPress={() => this.selecionarTipo(tipo)}
+                >
+                  <Text
+                    style={[
+                      styles.selectTexto,
+                      tipo === tipoUsuario && styles.selectTextoAtivo,
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.menuTexto,
-                        tipo === tipoUsuario && styles.menuTextoAtivo,
-                      ]}
-                    >
-                      {tipo}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+                    {tipo}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {/* seta (chevron) desenhada com View, sem libs */}
+            <View style={styles.seta} />
           </View>
 
           <TouchableOpacity
@@ -175,7 +162,7 @@ class TelaAtividade02 extends Component {
           </TouchableOpacity>
         </ScrollView>
 
-        {/* rodapé fixo, igual à tela 1 */}
+        {/* rodapé fixo */}
         <View style={styles.rodape}>
           <Text style={styles.rodapeTexto}>Já tem uma conta? </Text>
           <TouchableOpacity onPress={this.onFacaLogin}>
@@ -187,10 +174,8 @@ class TelaAtividade02 extends Component {
   }
 }
 
-// mesma paleta da tela 1 (reuso de conceito)
 const cores = {
   verde: '#4CAF50',
-  placeholder: '#9E9E9E',
   cinzaTexto: '#6B6B6B',
   branco: '#FFFFFF',
   preto: '#000000',
@@ -201,116 +186,126 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: cores.branco,
   },
+
+  // topo preto com logo
+  headerSafe: {
+    backgroundColor: cores.preto,
+  },
+  header: {
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: cores.preto,
+  },
+  // logo verde; o círculo branco atrás garante as escritas brancas
+  logoCirculo: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoFundo: {
+    position: 'absolute',
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    backgroundColor: cores.branco,
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    tintColor: cores.verde, // logo verde
+  },
+
   conteudo: {
     flex: 1,
   },
   conteudoInner: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 32,
-  },
-  logo: {
-    width: 64,
-    height: 64,
-    alignSelf: 'center',
-    marginBottom: 18,
+    paddingTop: 24,
+    paddingBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: cores.preto,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 16,
-    color: cores.cinzaTexto,
+    fontSize: 20,
+    color: cores.preto,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: cores.verde,
-    borderRadius: 8,
-    paddingHorizontal: 14,
+    borderRadius: 14,
+    paddingHorizontal: 12,
     paddingVertical: 12,
-    marginBottom: 14,
+    marginBottom: 16,
     backgroundColor: cores.branco,
     color: cores.preto,
-    fontSize: 15,
+    fontSize: 16,
   },
   label: {
     alignSelf: 'flex-start',
     color: cores.preto,
-    fontWeight: '600',
-    fontSize: 14,
+    fontSize: 15,
     marginTop: 4,
     marginBottom: 8,
   },
-  // wrapper agrupa botão + menu pra emendar as bordas
-  dropdownWrapper: {
-    marginBottom: 24,
-  },
-  dropdownBotao: {
+
+  // caixa do "Tipo de Usuário"
+  selectBox: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
+    justifyContent: 'space-between',
+    borderWidth: 1.5,
     borderColor: cores.verde,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 24,
     backgroundColor: cores.branco,
   },
-  // quando aberto: some a borda de baixo e os cantos de baixo
-  dropdownBotaoAberto: {
-    borderBottomWidth: 0,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+  selectOpcoes: {
+    flex: 1,
   },
-  dropdownValor: {
+  selectTexto: {
     color: cores.preto,
-    fontSize: 15,
-  },
-  dropdownSeta: {
-    color: cores.cinzaTexto,
     fontSize: 16,
-  },
-  // menu no fluxo: some a borda de cima e os cantos de cima -> vira um campo contínuo
-  menu: {
-    borderWidth: 1,
-    borderColor: cores.verde,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    backgroundColor: cores.branco,
     paddingVertical: 4,
-    overflow: 'hidden',
   },
-  menuItem: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  menuTexto: {
-    color: cores.preto,
-    fontSize: 15,
-  },
-  menuTextoAtivo: {
+  selectTextoAtivo: {
     color: cores.verde,
     fontWeight: 'bold',
   },
+  seta: {
+    width: 9,
+    height: 9,
+    borderRightWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: cores.cinzaTexto,
+    transform: [{ rotate: '45deg' }],
+    marginRight: 4,
+    marginBottom: 4,
+  },
+
   botao: {
     backgroundColor: cores.verde,
-    borderRadius: 8,
-    paddingVertical: 14,
+    borderRadius: 14,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   botaoTexto: {
     color: cores.branco,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '500',
   },
+
   rodape: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -318,12 +313,12 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   rodapeTexto: {
-    color: cores.cinzaTexto,
-    fontSize: 13,
+    color: cores.preto,
+    fontSize: 14,
   },
   rodapeLink: {
     color: cores.preto,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
     textDecorationLine: 'underline',
   },

@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 
 class TelaAtividade01 extends Component {
@@ -18,51 +20,64 @@ class TelaAtividade01 extends Component {
     };
   }
 
-  // Ação do botão "Entrar"
   onEntrar = () => {
     const { email, senha } = this.state;
-    if (!email.trim() || !senha.trim()) {
-      console.log('Preencha e-mail e senha.');
+
+    if (!email.trim() || !email.includes('@')) {
+      console.log('Informe um e-mail válido.');
       return;
     }
-    console.log('Login:', { email, senha });
-    // Quando você plugar o react-navigation, descomente:
+    if (!senha) {
+      console.log('Informe a senha.');
+      return;
+    }
+
+    console.log('Login:', { email });
+    // Ao plugar o react-navigation, descomente:
     // if (this.props.navigation) this.props.navigation.navigate('Home');
   };
 
   onEsqueciSenha = () => {
-    console.log('Fluxo de recuperação de senha');
-    // if (this.props.navigation) this.props.navigation.navigate('RecuperarSenha');
+    console.log('Esqueci minha senha');
   };
 
-  onCadastreSe = () => {
-    console.log('Ir para cadastro');
+  onCadastrese = () => {
+    console.log('Ir para o cadastro');
     // if (this.props.navigation) this.props.navigation.navigate('Cadastro');
   };
 
   render() {
     return (
       <View style={styles.container}>
-        {/* Bloco principal rolável e centralizado quando sobra espaço */}
+        <StatusBar barStyle="light-content" backgroundColor={cores.preto} />
+
+        {/* faixa preta do topo com a logo grande sobrepondo a borda (igual ao mockup) */}
+        <SafeAreaView style={styles.headerSafe}>
+          <View style={styles.header}>
+            <View style={styles.logoCirculo}>
+              <View style={styles.logoFundo} />
+              <Image
+                source={require('../img/logo-barao.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+          </View>
+        </SafeAreaView>
+
         <ScrollView
           style={styles.conteudo}
           contentContainerStyle={styles.conteudoInner}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Image
-            source={require('../img/logo-barao.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-
           <Text style={styles.title}>Bem-vindo!</Text>
           <Text style={styles.subtitle}>Acesse sua conta</Text>
 
           <TextInput
             style={styles.input}
             placeholder="E-mail"
-            placeholderTextColor={cores.placeholder}
+            placeholderTextColor={cores.verde}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
@@ -73,17 +88,19 @@ class TelaAtividade01 extends Component {
           <TextInput
             style={styles.input}
             placeholder="Senha"
-            placeholderTextColor={cores.placeholder}
+            placeholderTextColor={cores.verde}
             secureTextEntry
+            autoCapitalize="none"
             value={this.state.senha}
             onChangeText={(texto) => this.setState({ senha: texto })}
           />
 
           <TouchableOpacity
-            style={styles.link}
+            style={styles.esqueciWrapper}
+            activeOpacity={0.6}
             onPress={this.onEsqueciSenha}
           >
-            <Text style={styles.linkTexto}>Esqueci minha senha</Text>
+            <Text style={styles.esqueciTexto}>Esqueci minha senha</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -95,10 +112,10 @@ class TelaAtividade01 extends Component {
           </TouchableOpacity>
         </ScrollView>
 
-        {/* Rodapé fixo embaixo */}
+        {/* rodapé fixo */}
         <View style={styles.rodape}>
           <Text style={styles.rodapeTexto}>Ainda não tem conta? </Text>
-          <TouchableOpacity onPress={this.onCadastreSe}>
+          <TouchableOpacity onPress={this.onCadastrese}>
             <Text style={styles.rodapeLink}>Cadastre-se</Text>
           </TouchableOpacity>
         </View>
@@ -107,11 +124,8 @@ class TelaAtividade01 extends Component {
   }
 }
 
-// Paleta isolada pra reusar nas outras telas
 const cores = {
   verde: '#4CAF50',
-  placeholder: '#9E9E9E',
-  cinzaTexto: '#6B6B6B',
   branco: '#FFFFFF',
   preto: '#000000',
 };
@@ -121,65 +135,94 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: cores.branco,
   },
+
+  // topo preto + logo grande metade dentro, metade fora
+  headerSafe: {
+    backgroundColor: cores.preto,
+    zIndex: 10, // deixa a logo por cima do conteúdo branco
+  },
+  header: {
+    height: 56,
+    alignItems: 'center',
+    backgroundColor: cores.preto,
+  },
+  // logo verde; o círculo branco atrás garante as escritas brancas
+  logoCirculo: {
+    position: 'absolute',
+    bottom: -38,
+    width: 76,
+    height: 76,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoFundo: {
+    position: 'absolute',
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: cores.branco,
+  },
+  logo: {
+    width: 76,
+    height: 76,
+    tintColor: cores.verde, // logo verde
+  },
+
   conteudo: {
     flex: 1,
   },
   conteudoInner: {
-    flexGrow: 1,            // permite centralizar verticalmente quando couber
-    justifyContent: 'center',
+    flexGrow: 1,
     paddingHorizontal: 24,
-    paddingVertical: 32,
-  },
-  logo: {
-    width: 90,
-    height: 90,
-    alignSelf: 'center',
-    marginBottom: 20,
+    paddingTop: 68, // espaço para a logo que sai da faixa preta
+    paddingBottom: 16,
   },
   title: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: 'bold',
     color: cores.preto,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 16,
-    color: cores.cinzaTexto,
+    fontSize: 22,
+    color: cores.preto,
     textAlign: 'center',
-    marginBottom: 28,
+    marginBottom: 36,
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: cores.verde,
-    borderRadius: 8,
-    paddingHorizontal: 14,
+    borderRadius: 14,
+    paddingHorizontal: 12,
     paddingVertical: 12,
-    marginBottom: 14,
+    marginBottom: 16,
     backgroundColor: cores.branco,
     color: cores.preto,
-    fontSize: 15,
+    fontSize: 16,
   },
-  link: {
-    alignSelf: 'flex-start',
-    marginBottom: 18,
+  esqueciWrapper: {
+    alignSelf: 'center',
+    marginTop: 2,
+    marginBottom: 28,
   },
-  linkTexto: {
+  esqueciTexto: {
     color: cores.preto,
-    fontSize: 13,
+    fontSize: 14,
     textDecorationLine: 'underline',
   },
   botao: {
     backgroundColor: cores.verde,
-    borderRadius: 8,
-    paddingVertical: 14,
+    borderRadius: 14,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   botaoTexto: {
     color: cores.branco,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '500',
   },
+
   rodape: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -187,12 +230,12 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   rodapeTexto: {
-    color: cores.cinzaTexto,
-    fontSize: 13,
+    color: cores.preto,
+    fontSize: 14,
   },
   rodapeLink: {
     color: cores.preto,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
     textDecorationLine: 'underline',
   },
